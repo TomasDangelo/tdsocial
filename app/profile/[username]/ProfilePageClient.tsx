@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { SignInButton, useUser } from "@clerk/nextjs";
 import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { CalendarIcon, EditIcon, FileTextIcon, HeartIcon, LinkIcon, MapPinIcon,} from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -78,7 +79,7 @@ function ProfilePageClient({
     currentUser?.username === user.username ||
     currentUser?.emailAddresses[0].emailAddress.split("@")[0] === user.username;
 
-  const formattedDate = format(new Date(user.createdAt), "MMMM, d, yyyy");
+  const formattedDate = format(new Date(user.createdAt), "d 'de' MMMM, yyyy", { locale: es });
 
   return (
     <div className="max-w-3xl mx-auto">

@@ -66,10 +66,12 @@ export async function getUserPosts(userId: string) {
           },
         },
         likes: {
-          select: {
-            userId: true,
-          },
-        },
+                    include: {
+                        user: {
+                            select: { id: true, username: true, name: true, image: true }
+                        }
+                    }
+                },
         _count: {
           select: {
             likes: true,
@@ -90,61 +92,51 @@ export async function getUserPosts(userId: string) {
 }
 
 export async function getUserLikedPosts(userId: string) {
-  try {
-    const likedPosts = await prisma.post.findMany({
-      where: {
-        likes: {
-          some: {
-            userId,
-          },
+  return prisma.post.findMany({
+    where: {
+      likes: {
+        some: { userId },
+      },
+    },
+    include: {
+      author: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          username: true,
         },
       },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            image: true,
-          },
-        },
-        comments: {
-          include: {
-            author: {
-              select: {
-                id: true,
-                name: true,
-                username: true,
-                image: true,
-              },
+      comments: {
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+              image: true,
+              name: true,
             },
           },
-          orderBy: {
-            createdAt: "asc",
-          },
         },
-        likes: {
-          select: {
-            userId: true,
-          },
+        orderBy: {
+          createdAt: "asc",
         },
-        _count: {
-          select: {
-            likes: true,
-            comments: true,
+      },
+      likes: {
+        include: {
+          user: {
+            select: { id: true, username: true, name: true, image: true },
           },
         },
       },
-      orderBy: {
-        createdAt: "desc",
+      _count: {
+        select: {
+          likes: true,
+          comments: true,
+        },
       },
-    });
-
-    return likedPosts;
-  } catch (error) {
-    console.error("Error fetching liked posts:", error);
-    throw new Error("Failed to fetch liked posts");
-  }
+    },
+  });
 }
 
 export async function updateProfile(formData: FormData) {
@@ -194,4 +186,4 @@ export async function isFollowing(userId: string) {
     console.error("Error checking follow status:", error);
     return false;
   }
-} 
+}

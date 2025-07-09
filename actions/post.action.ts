@@ -53,11 +53,13 @@ export async function getPosts() {
                         createdAt: "asc"
                     }
                 },
-                likes: {
-                    select:{
-                        userId: true
+                 likes: {
+                    include: {
+                      user: {
+                        select: { id: true, username: true, name: true, image: true }
+                      }
                     }
-                },
+                 },
                 _count:{
                     select:{
                         likes: true,

@@ -8,9 +8,10 @@ import { Card, CardContent } from "./ui/card"
 import Link from "next/link"
 import { Avatar, AvatarImage } from "./ui/avatar"
 import {formatDistanceToNow} from 'date-fns'
+import { es } from "date-fns/locale";
 import { DeleteAlertDialog } from "./DeleteAlertDialog"
 import { Button } from "./ui/button"
-import { HeartIcon, LogInIcon, MessageCircleIcon, SendIcon } from "lucide-react"
+import { HeartIcon, LogInIcon, MessageCircleIcon, SendIcon, UsersIcon, XIcon } from "lucide-react"
 import { Textarea } from "./ui/textarea"
 
 type Posts = Awaited<ReturnType<typeof getPosts>>
@@ -25,6 +26,7 @@ function PostCard({post, dbUserId}: {post: Post, dbUserId: string | null}) {
   const [hasLiked, setHasLiked] = useState(post.likes.some(like => like.userId === dbUserId)) 
   const [optimisticLikes, setOptimisticLikes] = useState(post._count.likes)
   const [showComments, setShowComments] = useState(false)
+  const [showLikesModal, setShowLikesModal] = useState(false)
   const handleLike = async() =>{
     if(isLiking) return;
     try {
@@ -115,7 +117,7 @@ const handleDeleteComment = async (id: string) => {
                   <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                     <Link href={`/profile/${post.author.username}`}>@{post.author.username}</Link>
                     <span>•</span>
-                    <span>{formatDistanceToNow(new Date(post.createdAt))} ago</span>
+                    <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: es })}</span>
                   </div>
                 </div>
                 {isAuthor && (
@@ -139,13 +141,25 @@ const handleDeleteComment = async (id: string) => {
                 ) : (
                   <HeartIcon className="size-5" />
                 )}
-                <span>{optimisticLikes}</span>
+                <span
+                  className="cursor-pointer decoration-dotted"
+                  onClick={e => { e.stopPropagation(); setShowLikesModal(true); }}
+                  title="Ver a quiénes les gusta"
+                >
+                  {optimisticLikes}
+                </span>
               </Button>
             ) : (
               <SignInButton mode="modal">
                 <Button variant="ghost" size="sm" className="text-muted-foreground gap-2">
                   <HeartIcon className="size-5" />
-                  <span>{optimisticLikes}</span>
+                  <span
+>
+                    {optimisticLikes}
+                    <p className="cursor-pointer decoration-dotted"
+                    onClick={e => { e.stopPropagation(); setShowLikesModal(true); }}
+                    title="Ver a quiénes les gusta">Ver a quiénes les gusta</p>
+                  </span>
                 </Button>
               </SignInButton>
             )}
@@ -155,9 +169,46 @@ const handleDeleteComment = async (id: string) => {
               <MessageCircleIcon
                 className={`size-5 ${showComments ? "fill-blue-500 text-blue-500" : ""}`}
               />
-              <span>{post.comments.length}</span>
+              <span title="Ver comentarios">{post.comments.length}</span>
             </Button>
           </div>
+
+          {/* MODAL DE USUARIOS QUE DIERON LIKE */}
+          {showLikesModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+              <div className="bg-background rounded-lg shadow-lg p-6 w-full max-w-xs relative">
+                <button
+                  className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowLikesModal(false)}
+                  aria-label="Cerrar"
+                >
+                  <XIcon className="size-5" />
+                </button>
+                <div className="flex items-center gap-2 mb-4">
+                  <UsersIcon className="size-5" />
+                  <span className="font-semibold">A quienes les gusta</span>
+                </div>
+                <div className="max-h-60 overflow-y-auto">
+                  {post.likes.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">Nadie le ha dado like aún.</p>
+                  ) : (
+                    <ul>
+                      {post.likes.map(like => (
+                        <li key={like.user.id} className="flex items-center gap-2 py-1">
+                          <Avatar className="size-6">
+                            <AvatarImage src={like.user.image ?? "/avatar.png"} />
+                          </Avatar>
+                          <Link href={`/profile/${like.user.username}`} className="hover:underline">
+                            {like.user.name ?? like.user.username}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* COMENTARIOS */}
           {showComments && (
@@ -177,7 +228,7 @@ const handleDeleteComment = async (id: string) => {
                         </span>
                         <span className="text-sm text-muted-foreground">·</span>
                         <span className="text-sm text-muted-foreground">
-                          {formatDistanceToNow(new Date(comment.createdAt))} ago
+                          {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: es })}
                         </span>
                           {dbUserId === comment.author.id && (
                           <>

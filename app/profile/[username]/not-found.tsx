@@ -1,40 +1,42 @@
-import {
-  getProfileByUsername,
-  getUserLikedPosts,
-  getUserPosts,
-  isFollowing,
-} from "@/actions/profile.action";
-import { notFound } from "next/navigation";
-import ProfilePageClient from "./ProfilePageClient";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { HomeIcon, ArrowLeftIcon } from "lucide-react";
 
-export async function generateMetadata({ params }: { params: { username: string } }) {
-  const user = await getProfileByUsername(params.username);
-  if (!user) return;
-
-  return {
-    title: `${user.name ?? user.username}`,
-    description: user.bio || `Check out ${user.username}'s profile.`,
-  };
-}
-
-async function ProfilePageServer({ params }: { params: { username: string } }) {
-  const user = await getProfileByUsername(params.username);
-
-  if (!user) notFound();
-
-  const [posts, likedPosts, isCurrentUserFollowing] = await Promise.all([
-    getUserPosts(user.id),
-    getUserLikedPosts(user.id),
-    isFollowing(user.id),
-  ]);
-
+export default function NotFound() {
   return (
-    <ProfilePageClient
-      user={user}
-      posts={posts}
-      likedPosts={likedPosts}
-      isFollowing={isCurrentUserFollowing}
-    />
+    <div className="min-h-[80vh] grid place-items-center px-4">
+      <Card className="w-full max-w-md">
+        <CardContent className="pt-6">
+          <div className="text-center space-y-6">
+            {/* LARGE 404 TEXT */}
+            <p className="text-8xl font-bold text-primary font-mono">404</p>
+
+            {/* MESSAGE */}
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold tracking-tight">Usuario no encontrado</h1>
+              <p className="text-muted-foreground">El usuario que buscas no existe.</p>
+            </div>
+
+            {/* ACTION BUTTONS */}
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button variant="default" asChild>
+                <Link href="/">
+                  <HomeIcon className="mr-2 size-4" />
+                  Volver a inicio
+                </Link>
+              </Button>
+
+              <Button variant="outline" asChild>
+                <Link href="/">
+                  <ArrowLeftIcon className="mr-2 size-4" />
+                  Inicio
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
-export default ProfilePageServer;

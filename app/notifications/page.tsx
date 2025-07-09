@@ -6,6 +6,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
 import { HeartIcon, MessageCircleIcon, UserPlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -57,7 +58,7 @@ function NotificationsPage() {
       <Card>
         <CardHeader className="border-b">
           <div className="flex items-center justify-between">
-            <CardTitle>Notifications</CardTitle>
+            <CardTitle>Notificaciones</CardTitle>
             <span className="text-sm text-muted-foreground">
               {notifications.filter((n) => !n.read).length} sin leer
             </span>
@@ -109,7 +110,7 @@ function NotificationsPage() {
                       )}
 
                     <p className="text-sm text-muted-foreground pl-6">
-                      {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                      {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true, locale: es })}
                     </p>
                   </div>
                 </div>
