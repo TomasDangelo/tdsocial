@@ -141,11 +141,7 @@ const handleDeleteComment = async (id: string) => {
                 ) : (
                   <HeartIcon className="size-5" />
                 )}
-                <span
-                  className="cursor-pointer decoration-dotted"
-                  onClick={e => { e.stopPropagation(); setShowLikesModal(true); }}
-                  title="Ver a quiénes les gusta"
-                >
+                <span className="cursor-pointer decoration-dotted" onClick={e => { e.stopPropagation(); setShowLikesModal(true); }} title="Ver a quiénes les gusta">
                   {optimisticLikes}
                 </span>
               </Button>
@@ -153,12 +149,10 @@ const handleDeleteComment = async (id: string) => {
               <SignInButton mode="modal">
                 <Button variant="ghost" size="sm" className="text-muted-foreground gap-2">
                   <HeartIcon className="size-5" />
-                  <span
->
-                    {optimisticLikes}
-                    <p className="cursor-pointer decoration-dotted"
+                  <span className="cursor-pointer decoration-dotted"
                     onClick={e => { e.stopPropagation(); setShowLikesModal(true); }}
-                    title="Ver a quiénes les gusta">Ver a quiénes les gusta</p>
+                    title="Ver a quiénes les gusta">
+                    {optimisticLikes}
                   </span>
                 </Button>
               </SignInButton>
